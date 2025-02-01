@@ -1,23 +1,40 @@
 ﻿
 Console.WriteLine("Введите имя пользователя");
-var userName = "admin";
-if (userName == "admin") 
+var userName = Console.ReadLine();
+if (userName == "admin")
 {
     Console.WriteLine("Вы администратор?");
 }
+
 Console.WriteLine("Вы женщина или мужчина?");
-var gender = "женщина";
+var gender = Console.ReadLine();
+var answer = "";
+var answer2 = "";
 if (gender == "мужчина")
 {
     Console.WriteLine("Вы женаты?");
+    answer = Console.ReadLine();
 }
 else if (gender == "женщина")
 {
     Console.WriteLine("Вы замужем?");
+    answer = Console.ReadLine();
 }
-Console.WriteLine("вы замужем.");
+
+
+if (answer == "да")
+{
+    Console.WriteLine("вы женаты");
+}
+else if (answer2 == "да")
+{
+    Console.WriteLine("Вы замужем");
+}
+
+
 Console.WriteLine("Сколько вам лет?");
-var age = 20;
+var ageAsString = Console.ReadLine();
+var age = int.Parse(ageAsString);
 if (age < 18)
 {
     Console.WriteLine("Доступ запрещен");
@@ -26,9 +43,10 @@ else if (age >= 18)
 {
     Console.WriteLine("Доступ разрешен");
 }
+
 Console.WriteLine("В какой стране вы живете?");
-var country = "Египет";
-if (country == "РФ")
+var country = Console.ReadLine();
+if (country == "Россия")
 {
     Console.WriteLine("Вы живете в России");
 }
