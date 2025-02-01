@@ -60,5 +60,5 @@ else if (country == "Турция")
 }
 else
 {
-    Console.WriteLine("Вы живете в египте");
+    Console.WriteLine("Вы живете в " + country);
 }
