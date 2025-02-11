@@ -79,16 +79,20 @@ int начальникПодчиненные()
     return workers_number;
 }
 
-string датаРождения()
+int датаРождения()
 {
-    var датаРождения1 = "";
-    while (датаРождения1 == "")
+    var датаРождения1 = 0;
+    while (true)
     {
         Console.WriteLine("Назовите вашу дату рождения");
         var birth_num = Console.ReadLine();
         var датаРождения12 = int.Parse(birth_num);
+        if(датаРождения12 > 0)
+        {
+            break;
+        }
     }
- return датаРождения1;
+    return датаРождения1;
 }
 Console.WriteLine(датаРождения());
 
@@ -100,3 +104,17 @@ string имяДевушки()
     return newName;
 }
 Console.WriteLine(имяДевушки());
+
+
+Console.WriteLine("Сколько у вас любимых фильмов?");
+var films_text = Console.ReadLine();
+var films = int.Parse(films_text);
+for (int num = 1; num < 100; num++)
+{
+    Console.WriteLine("Как называется фильм " + num + "?");
+    var nameFilm = Console.ReadLine();
+    if (num >= films)
+    {
+        break;
+    }
+}
