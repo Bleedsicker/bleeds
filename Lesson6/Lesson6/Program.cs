@@ -1,49 +1,43 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using Class1;
+using Class2;
+using Class3;
 
-class Турист
+internal class Lesson6
 {
-    public string Имя;
-    public int Возраст;
-    public string Место;
-    public string Билет()
+    private static void Main(string[] args)
     {
-        return Имя + " " + Место;
-    }
-}
+        var турист = new Турист();
+        турист.Имя = "Майкл";
+        турист.Возраст = 32;
+        турист.Место = "Китай";
+
+        var куртка = new ВерхняяОдежда();
+        куртка.Цвет = "Красный";
+        куртка.Размер = "XL";
+        куртка.Цена = 5500;
+        куртка.ShowText();
+        var пальто = new ВерхняяОдежда();
+        пальто.Цвет = "Серый";
+        пальто.Размер = "L";
+        пальто.Цена = 4000;
+        пальто.ShowText();
+        var шуба = new ВерхняяОдежда();
+        шуба.Цвет = "Черный";
+        шуба.Размер = "S";
+        шуба.Цена = 100000;
+        шуба.ShowText();
 
 
-class ВерхняяОдежда
-{
-    public string Цвет;
-    public string Размер;
-    public int Цена;
-    public string Категория;
-    public void ShowText()
-    {
-        Console.WriteLine("Назовите категорию одежды");
-        var answer = Console.ReadLine();
-        Категория = answer;
-        Console.WriteLine("Цвет:" + Цвет + " Размер:" + Размер + " Цена:" + Цена);
-    }
-}
 
-
-class Ученик
-{
-    public string Имя;
-    public int НомерКласса;
-    public string Предмет;
-    public void AnswerStudent()
-    {
-        Console.WriteLine("Нравится ли вам выбранный предмет?");
-        var answer = Console.ReadLine();
-        if (answer == "да")
-        {
-            Console.WriteLine("Урок начнется через час");
-        }
-        else
-        {
-            Console.WriteLine("Какой предмет вам нравится больше?");
-        }
+        var ученик1 = new Ученик();
+        ученик1.Имя = "Миша";
+        ученик1.Предмет = "Биология";
+        ученик1.НомерКласса = 10;
+        ученик1.AnswerStudent();
+        var ученик2 = new Ученик();
+        ученик2.Имя = "Маша";
+        ученик2.Предмет = "Алгебра";
+        ученик2.НомерКласса = 8;
+        ученик2.AnswerStudent();
     }
 }
