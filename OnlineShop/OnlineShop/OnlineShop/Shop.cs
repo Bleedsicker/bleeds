@@ -47,14 +47,13 @@ public class Shop
         for (int i = 0; i < Users.Count; i++)
         {
             var user = Users[i];
-            if (user.UserName == userName)
+
+            if (user.Password == userPassword && user.UserName == userName)
             {
-                if (user.Password == userPassword && user.UserName == userName)
-                {
-                    Console.WriteLine("Welcome.");
-                    return user;
-                }
+                Console.WriteLine("Welcome.");
+                return user;
             }
+
         }
         Console.WriteLine("User with with username and password cant be found");
         return null;
