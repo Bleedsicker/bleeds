@@ -49,7 +49,7 @@ public class Shop
             var user = Users[i];
             if (user.UserName == userName)
             {
-                if (user.Password == userPassword && user.UserName != userName)
+                if (user.Password == userPassword && user.UserName == userName)
                 {
                     Console.WriteLine("Welcome.");
                     return user;
