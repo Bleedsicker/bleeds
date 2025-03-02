@@ -94,7 +94,7 @@ int датаРождения()
     }
     return датаРождения1;
 }
-Console.WriteLine(датаРождения());
+
 
 string имяДевушки()
 {
@@ -103,18 +103,15 @@ string имяДевушки()
     var newName = "Дорогая," + name + "," + "ты сегодня как всегда прекрасно выглядишь.";
     return newName;
 }
-Console.WriteLine(имяДевушки());
+
 
 
 Console.WriteLine("Сколько у вас любимых фильмов?");
 var films_text = Console.ReadLine();
 var films = int.Parse(films_text);
-for (int num = 1; num < 100; num++)
+for (int num = 0; num < films; num++)
 {
-    Console.WriteLine("Как называется фильм " + num + "?");
+    Console.WriteLine("Как называется фильм " + (num + 1) + "?");
     var nameFilm = Console.ReadLine();
-    if (num >= films)
-    {
-        break;
-    }
 }
+Console.WriteLine(films_text);
