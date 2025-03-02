@@ -3,8 +3,24 @@
 
 var shop = new Shop();
 shop.Users = new List<User>();
-var newUser = shop.NewUser();
-shop.Users.Add(newUser);
-shop.NewUser();
-shop.Users.Add(newUser);
-shop.OldUser();
+
+while (true)
+{
+    var userChoice = shop.Choice();
+    if (userChoice == 1)
+    {
+        var newUser = shop.NewUser();
+        if (newUser != null )
+        {
+            shop.Users.Add(newUser);
+        }
+    }
+    else
+    {
+        var registeredUser = shop.Login();
+        if (registeredUser != null)
+        {
+
+        }
+    }
+}

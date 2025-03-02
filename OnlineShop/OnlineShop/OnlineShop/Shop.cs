@@ -12,74 +12,59 @@ public class Shop
     public int Choice()
     {
         Console.WriteLine("1. register.\t2. login");
-        var loginText = Console.ReadLine();
-        var login = int.Parse(loginText);
-        return login;
+        var ChoiceText = Console.ReadLine();
+        var Choice = int.Parse(ChoiceText);
+        return Choice;
     }
 
-    public User NewUser()
+    public User? NewUser()
     {
-        var user = new User();
-        if (Choice() == 1)
-            {
-                Console.WriteLine("userName:");
-                user.UserName = Console.ReadLine();
-                for (int i = 0; i < Users.Count; i++)
-                {
-                    var userr = Users[i];
-                    if (userr.UserName == user.UserName)
-                    {
-                        Console.WriteLine("User is used");
-                    return userr;
-                    }
-                }
-                Console.WriteLine("Password:");
-                user.Password = Console.ReadLine();
-                Console.WriteLine("Address:");
-                user.Address = Console.ReadLine();
-                Console.WriteLine("Age:");
-                user.Age = int.Parse(Console.ReadLine());
-                Console.WriteLine("Email:");
-                user.Email = Console.ReadLine();
+        var Newuser = new User();
 
-            }
-        return user;
-    }
-
-    public User OldUser()
-    {
-        var oldUserr = new User();
-        if (Choice() == 2)
+        Console.WriteLine("userName:");
+        Newuser.UserName = Console.ReadLine();
+        for (int i = 0; i < Users.Count; i++)
         {
-            Console.WriteLine("Enter the username;");
-            var oldUserName = Console.ReadLine();
-            Console.WriteLine("Enter the password");
-            var oldUserPassword = Console.ReadLine();
-            for (int i = 0; i < Users.Count; i++)
+            var user = Users[i];
+            if (user.UserName == Newuser.UserName)
             {
-                var oldUser = Users[i];
-                if (oldUser.UserName == oldUserName)
+                Console.WriteLine("User is used");
+                return null;
+            }
+        }
+        Console.WriteLine("Password:");
+        Newuser.Password = Console.ReadLine();
+
+        return Newuser;
+    }
+
+    public User? Login()
+    {
+        Console.WriteLine("Enter the username;");
+        var userName = Console.ReadLine();
+        Console.WriteLine("Enter the password");
+        var userPassword = Console.ReadLine();
+        for (int i = 0; i < Users.Count; i++)
+        {
+            var user = Users[i];
+            if (user.UserName == userName)
+            {
+                if (user.Password == userPassword && user.UserName != userName)
                 {
-                    if (oldUser.Password == oldUserPassword)
-                    {
-                        Console.WriteLine("Welcome.");
-                        return oldUser;
-                    }
-                    else if (oldUser.UserName != oldUserName)
-                    {
-                        if (oldUser.Password != oldUserPassword)
-                        {
-                            Console.WriteLine("try again");
-                        }
-                    }
+                    Console.WriteLine("Welcome.");
+                    return user;
                 }
             }
         }
-        return oldUserr;
+        Console.WriteLine("User with with username and password cant be found");
+        return null;
     }
+
+
+
 }
 
 
 
-        
-       
+
+
