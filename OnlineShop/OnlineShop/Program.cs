@@ -10,17 +10,17 @@ while (true)
     if (userChoice == 1)
     {
         var newUser = shop.NewUser();
-        if (newUser != null )
+        if (newUser != null)
         {
             shop.Users.Add(newUser);
         }
     }
-    else
+    else if (userChoice == 2)
     {
         var registeredUser = shop.Login();
         if (registeredUser != null)
         {
-
+            shop.Menu(registeredUser);
         }
     }
 }
