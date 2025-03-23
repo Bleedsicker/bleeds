@@ -3,7 +3,7 @@
 
 var shop = new Shop();
 shop.Users = new List<User>();
-
+shop.Products = new List<Product>();
 while (true)
 {
     var userChoice = shop.Choice();
@@ -20,7 +20,19 @@ while (true)
         var registeredUser = shop.Login();
         if (registeredUser != null)
         {
-            shop.Menu(registeredUser);
+            while (registeredUser != null)
+            {
+                var mainMenuChoice = shop.MainMenuChoice(registeredUser);
+                if (mainMenuChoice == 7)
+                {
+                    registeredUser = null;
+                }
+                else
+                {
+                    shop.ProcessMainMenuChoice(registeredUser, mainMenuChoice);
+                    
+                }
+            }
         }
     }
 }
