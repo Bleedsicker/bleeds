@@ -1,9 +1,13 @@
-﻿using OnlineShop;
+﻿
+using OnlineShop;
 
-
+var cart = new ShoppingCart();
 var shop = new Shop();
 shop.Users = new List<User>();
 shop.Products = new List<Product>();
+shop.Coupons = new List<Coupons>();
+cart.ProductsCart = new List<Product>();
+
 while (true)
 {
     var userChoice = shop.Choice();
@@ -29,7 +33,7 @@ while (true)
                 }
                 else
                 {
-                    shop.ProcessMainMenuChoice(registeredUser, mainMenuChoice);
+                    shop.ProcessMainMenuChoice(registeredUser, mainMenuChoice, cart);
                     
                 }
             }

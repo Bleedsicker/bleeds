@@ -1,7 +1,8 @@
 ﻿
 namespace OnlineShop
 {
-    internal class PuchaseHistoryMenu
+    public class PuchaseHistoryMenu
     {
+
     }
 }

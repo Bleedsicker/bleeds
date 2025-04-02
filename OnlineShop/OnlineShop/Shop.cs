@@ -1,12 +1,12 @@
 ﻿
-
-
 namespace OnlineShop;
 
 public class Shop
 {
     public List<User> Users { get; set; }
     public List<Product> Products { get; set; }
+    public List<Coupons> Coupons { get; set; }
+
     public int Choice()
     {
         Console.WriteLine("1. register.\t2. login");
@@ -79,7 +79,7 @@ public class Shop
     }
 
 
-    public void ProcessMainMenuChoice(User registeredUser, int choice)
+    public void ProcessMainMenuChoice(User registeredUser, int choice, ShoppingCart shoppingCart)
     {
         if (choice == 1)
         {
@@ -99,12 +99,7 @@ public class Shop
                 }
                 else if (productMenuChoice == 2)
                 {
-                    //TODO вывести список всех продуктов с номерами.
-                    for (int i = 0; i < Products.Count; i++)
-                    {
-                        var products = Products[i];
-                       Console.WriteLine((i + 1) + products.ProductName);
-                    }
+                    ProductService.ShowProductList(Products);
                     Console.WriteLine("Enter the product number:");
                     var numberOfProductT = Console.ReadLine();
                     var numberOfProduct = 0;
@@ -117,12 +112,12 @@ public class Shop
                 }
                 else if (productMenuChoice == 3)
                 {
-                   // ShowPurchaseList();
+                    // ShowPurchaseList();
                     // создать заказ. он будет содержать юзера и список продуктов.
                 }
                 else if (productMenuChoice == 4)
                 {
-                    //TODO вывести список всех продуктов с номерами.
+                    ProductService.ShowProductList(Products);
                     Console.WriteLine("Enter the product number:");
                     var numberOfProductT = Console.ReadLine();
                     var numberOfProduct = 0;
@@ -141,11 +136,35 @@ public class Shop
             while (true)
             {
                 ShowCouponsMenu();
-                var returnToMenuT = Console.ReadLine();
-                var returnToMenu = int.Parse(returnToMenuT);
-                if (returnToMenu == 4)
+                var couponsMenuChoiceT = Console.ReadLine();
+                var couponsMenuChoice = int.Parse(couponsMenuChoiceT);
+                if (couponsMenuChoice == 4)
                 {
                     break;
+                }
+                else if (couponsMenuChoice == 1)
+                {
+                    var couponService = CouponService.CreateNewCoupon();
+                    Coupons.Add(couponService);
+                }
+                else if(couponsMenuChoice == 2)
+                {
+                    CouponService.ShowAvailableCoupons(Coupons);
+                    Console.WriteLine("Press any key to go back");
+                    Console.ReadLine();
+                }
+                else if(couponsMenuChoice == 3)
+                {
+                    CouponService.ShowAvailableCoupons(Coupons);
+                    Console.WriteLine("Choose coupons you want to delete");
+                    var numberOfCouponT = Console.ReadLine();
+                    var numberOfCoupon = 0;
+                    if (int.TryParse(numberOfCouponT, out numberOfCoupon) &&
+                        Coupons.Count > numberOfCoupon - 1 &&
+                        numberOfCoupon > 0)
+                    {
+                        Coupons.RemoveAt(numberOfCoupon - 1);
+                    }
                 }
             }
         }
@@ -167,11 +186,36 @@ public class Shop
             while (true)
             {
                 ShowPurchaseMenu();
-                var returnToMenuT = Console.ReadLine();
-                var returnToMenu = int.Parse(returnToMenuT);
-                if (returnToMenu == 4)
+                var PurchaseMenuChoiceT = Console.ReadLine();
+                var PurchaseMenuChoice = int.Parse(PurchaseMenuChoiceT);
+                if (PurchaseMenuChoice == 5)
                 {
                     break;
+                }
+                else if (PurchaseMenuChoice == 1)
+                {
+                    shoppingCart.AddToCart(Products);
+
+                }
+                else if (PurchaseMenuChoice == 2)
+                {
+                    shoppingCart.ShowCartList(shoppingCart.ProductsCart);
+                    Console.WriteLine("Press any key to go back");
+                    Console.ReadLine();
+                }
+                else if (PurchaseMenuChoice == 3)
+                {
+                    shoppingCart.ShowCartList(shoppingCart.ProductsCart);
+                    Console.WriteLine("Choose product you want to delete");
+                    var numberOfProductT = Console.ReadLine();
+                    var numberOfProduct = 0;
+                    if (int.TryParse(numberOfProductT, out numberOfProduct) &&
+                        Products.Count > numberOfProduct - 1 &&
+                        numberOfProduct > 0)
+                    {
+                        shoppingCart.ProductsCart.RemoveAt(numberOfProduct - 1);
+                    }
+
                 }
             }
         }
@@ -212,8 +256,9 @@ public class Shop
 
     private void ShowCouponsMenu()
     {
+        //Купоны такие же как продукты
         Console.Clear();
-        Console.WriteLine("1. Apply a coupon to your cart");
+        Console.WriteLine("1. Add coupon");
         Console.WriteLine("2. View available coupons");
         Console.WriteLine("3. Remove a coupon");
         Console.WriteLine("4. Return to the main menu");
@@ -229,11 +274,13 @@ public class Shop
 
     private void ShowPurchaseMenu()
     {
+
         Console.Clear();
         Console.WriteLine("1. Add items to cart");
         Console.WriteLine("2. View cart");
-        Console.WriteLine("3. Apply discount code");
-        Console.WriteLine("4. Return to the main menu");
+        Console.WriteLine("3. Delete items from cart");
+        Console.WriteLine("4. Apply discount code");
+        Console.WriteLine("5. Return to the main menu");
     }
 
     private void ShowUserSettingsMenu()
@@ -241,7 +288,7 @@ public class Shop
         Console.Clear();
         Console.WriteLine("1. Update personal information");
         Console.WriteLine("2. Change email address");
-        Console.WriteLine("3. Chanhe the shipping address");
+        Console.WriteLine("3. Change the shipping address");
         Console.WriteLine("4. Return to the main menu");
     }
 
@@ -251,6 +298,7 @@ public class Shop
         Console.WriteLine("1. Change password");
         Console.WriteLine("2. Return to the main menu");
     }
+
 }
 
 

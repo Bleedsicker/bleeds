@@ -1,5 +1,4 @@
-﻿
-namespace OnlineShop;
+﻿namespace OnlineShop;
 
 public class ProductService
 {
@@ -22,4 +21,12 @@ public class ProductService
         product.ProductDescription = Console.ReadLine();
     }
 
+    public static void ShowProductList(List<Product> products)
+    {
+        for (int i = 0; i < products.Count; i++)
+        {
+            var product = products[i];
+            Console.WriteLine(i + 1 + ". " + product.ProductName);
+        }
+    }
 }
