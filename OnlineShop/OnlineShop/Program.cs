@@ -1,12 +1,15 @@
-﻿
-using OnlineShop;
+﻿using OnlineShop;
+using OnlineShop.Services;
 
 var cart = new ShoppingCart();
 var shop = new Shop();
 shop.Users = new List<User>();
 shop.Products = new List<Product>();
-shop.Coupons = new List<Coupons>();
+shop.Coupons = new List<Coupon>();
 cart.ProductsCart = new List<Product>();
+var productService = new ProductService();
+var couponService = new CouponService();
+var shoppingCartService = new ShoppingCartService();
 
 while (true)
 {
@@ -33,8 +36,7 @@ while (true)
                 }
                 else
                 {
-                    shop.ProcessMainMenuChoice(registeredUser, mainMenuChoice, cart);
-                    
+                    shop.ProcessMainMenuChoice(registeredUser, mainMenuChoice, cart, productService, shop, couponService, shoppingCartService);
                 }
             }
         }

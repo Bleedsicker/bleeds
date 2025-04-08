@@ -3,9 +3,9 @@ namespace OnlineShop
 {
     public enum DiscountType
     {
-        Prosent,
+        Percent = 1,
 
-        Absolut,
+        Absolut = 2,
 
     }
 }

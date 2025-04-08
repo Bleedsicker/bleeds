@@ -1,11 +1,12 @@
 ﻿
+using OnlineShop.Services;
+
 namespace OnlineShop
 {
     public class ShoppingCart
     {
 
         public List<Product> ProductsCart { get; set; }
-        //доделать пункты меню
 
         public void AddToCart(List<Product> products)
         {
@@ -25,7 +26,6 @@ namespace OnlineShop
                 }
             }
         }
-
         public void ShowCartList(List<Product> products)
         {
             for (int i = 0; i < products.Count; i++)

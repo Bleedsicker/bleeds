@@ -1,7 +1,6 @@
-﻿
-namespace OnlineShop;
+﻿namespace OnlineShop.Services;
 
-public class UserSettings
+public class UserService
 {
     public static void ChangeUsername(User registeredUser)
     {
@@ -20,13 +19,12 @@ public class UserSettings
             }
         }
     }
-
     public static void ChangePassword(User registeredUser)
     {
         while (true)
         {
             var userList = new Shop();
-            
+
             var returnToMenuT = Console.ReadLine();
             var returnToMenu = int.Parse(returnToMenuT);
             if (returnToMenu == 1)
