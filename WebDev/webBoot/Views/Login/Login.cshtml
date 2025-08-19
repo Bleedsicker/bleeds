@@ -1,0 +1,15 @@
+﻿@model LoginModel
+<h1>Welcome</h1>
+<div>
+	<form asp-action="Login">
+		<label>Username</label>
+		<input type="text" asp-for="Username" />
+		@Html.ValidationMessageFor(m => m.Username)
+
+		<label>Password</label>
+		<input type="text" asp-for="Password" />
+		@Html.ValidationMessageFor(m => m.Password)
+
+		<button type="submit">Enter</button>
+	</form>
+</div>

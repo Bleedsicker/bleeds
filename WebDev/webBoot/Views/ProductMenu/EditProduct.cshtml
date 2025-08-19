@@ -1,0 +1,29 @@
+﻿@model ProductModel
+
+<div class="text-center">
+    <div style="font:xx-large"</div>
+    <h1 style="font:normal">Products</h1>
+</div>
+
+<div style="margin: 2px; padding: 3px;"></div>
+<div class="d-flex justify-content-center gap-3 mt-4">
+    <form asp-controller="ProductMenu" asp-action="EditProduct">
+
+		<input type="hidden" asp-for="ProductId" />
+
+		<label>ProductName</label>
+		<input type="text" asp-for="ProductName" />
+		@Html.ValidationMessageFor(m => m.ProductName)
+
+		<label>ProductDescription</label>
+		<input type="text" asp-for="ProductDescription" />
+		@Html.ValidationMessageFor(m => m.ProductDescription)
+
+        <button type="submit">Enter</button>
+    </form>
+ </div>
+
+
+
+
+
