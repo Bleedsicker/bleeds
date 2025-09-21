@@ -1,6 +1,10 @@
 ﻿using DataAccess.Repository;
 using Domain;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using WebDev.Models;
 
 namespace WebDev.Controllers;
@@ -27,7 +31,7 @@ public class LoginController : Controller
     }
 
     [HttpPost]
-    public IActionResult Register(RegisterModel model)
+    public async Task<IActionResult> Register(RegisterModel model)
     {
         if(!ModelState.IsValid)
         {
@@ -46,6 +50,8 @@ public class LoginController : Controller
                 Password = model.Password,
                 Name = model.Username
             });
+
+            Authentication(model);
 
             return RedirectToAction(nameof(Login));
         }
@@ -70,7 +76,34 @@ public class LoginController : Controller
         }
         else
         {
-            return RedirectToAction("MainMenu", "MainMenu");
+            return RedirectToAction("Index", "MainMenu");
         }
+    }
+
+    public async void Authentication(RegisterModel model)
+    {
+        var claims = new List<Claim>(); //TODO подумать реюз
+        var claimName = new Claim(ClaimTypes.Name, model.Username);
+        claims.Add(claimName);
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        var authProperties = new AuthenticationProperties()
+        {
+            IsPersistent = true,
+            AllowRefresh = true,
+            ExpiresUtc = DateTimeOffset.Now.AddDays(1)
+        };
+
+        var principal = new ClaimsPrincipal(identity);
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
+
+    }
+
+    public async Task<IActionResult> LogOut()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToAction(nameof(WelcomePage));
     }
 }

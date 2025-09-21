@@ -9,4 +9,6 @@ public interface IProductRepository
     void AddProduct(Product product);
     Product GetProduct(long id);
     void UpdateProduct(Product product);
+
+    void DeleteProduct(long id);
 }

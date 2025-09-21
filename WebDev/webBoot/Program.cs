@@ -1,4 +1,6 @@
 using DataAccess;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using WebDev.Authorization;
 using WebDev.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,9 +9,30 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<ProductService>();
-
+builder.Services.AddSingleton<CouponService>();
 
 builder.Services.AddDataAccessLayer(builder.Configuration);
+
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(configureOptions =>
+    {
+        configureOptions.LoginPath = "/Login/Register";
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AuthorizationConventions.PolicyName, policy =>
+    {
+        policy.RequireAuthenticatedUser();
+    });
+});
+
+builder.Services.AddMvc(options =>
+{
+    options.Conventions.Add(new AuthorizationConventions());
+});
+
 
 var app = builder.Build();
 
@@ -26,6 +49,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

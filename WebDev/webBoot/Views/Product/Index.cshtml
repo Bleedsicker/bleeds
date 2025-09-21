@@ -1,0 +1,23 @@
+﻿@model List<ProductModel>
+<h1 style="text-center"> Welcome to the Product Menu </h1>
+
+<div class="d-flex justify-content-center gap-3 mt-4">
+    @Html.ActionLink("Add products", "AddProduct", "Product", null, new { @class = "btn btn-primary" })
+
+    <h1 style="text-center"> Your Products </h1>
+
+    <div class="d-flex justify-content-center gap-3 mt-4">
+
+        <br />
+        <br />
+
+        @foreach (var product in Model)
+        {
+            @Html.ActionLink(product.ProductName, "EditProduct", "Product", new { id = product.ProductId })
+            <br />
+            <br />
+            @Html.ActionLink("delete products", "DeleteProduct", "Product", new { id = product.ProductId })
+        }
+
+    </div>
+</div>

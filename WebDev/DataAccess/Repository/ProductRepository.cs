@@ -31,4 +31,11 @@ internal class ProductRepository : IProductRepository
         _dbContext.Products.Update(product);
         _dbContext.SaveChanges();
     }
+
+    public void DeleteProduct(long id)
+    {
+        var product = _dbContext.Products.FirstOrDefault(o => o.Id == id);
+        _dbContext.Remove(product);
+        _dbContext.SaveChanges();
+    }
 }

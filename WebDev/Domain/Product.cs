@@ -3,10 +3,14 @@ namespace Domain;
 
 public class Product
 {
-    public string ProductName { get; set; }
+    // TODO сделать Price(decimal), сделать Name и Description, сделать новую таблицу OrderProduct (почитать про Relanrionship ManyToMany)
+    public string Name { get; set; }
 
-    public string ProductDescription { get; set; }
+    public string Description { get; set; }
+
+    public decimal Price { get; set; }
 
     public long Id { get; set; }  
 
+    public ICollection<OrderProduct> OrderProducts { get; set; }
 }
