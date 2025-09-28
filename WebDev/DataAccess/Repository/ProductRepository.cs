@@ -1,6 +1,6 @@
-﻿namespace DataAccess.Repository;
-using Domain;
+﻿using Domain;
 
+namespace DataAccess.Repository;
 internal class ProductRepository : IProductRepository
 {
     private readonly WebDevDBcontext _dbContext;

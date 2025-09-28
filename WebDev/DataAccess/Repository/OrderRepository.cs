@@ -1,13 +1,15 @@
-﻿namespace DataAccess.Repository;
-using Domain;
+﻿using Domain;
 
+namespace DataAccess.Repository;
 internal class OrderRepository: IOrderRepository
 {
     private readonly WebDevDBcontext _dbContext;
+
     public OrderRepository(WebDevDBcontext dBContext)
     {
         _dbContext = dBContext;
     }
+
     public void AddOrder(Order order)
     {
         _dbContext.Orders.Add(order);

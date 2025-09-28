@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using WebDev.Models;
 
 namespace WebDev.Controllers;
@@ -64,7 +63,7 @@ public class LoginController : Controller
     }
 
     [HttpPost]
-    public IActionResult Login(LoginModel model)
+    public async Task<IActionResult> Login(LoginModel model, RegisterModel model1)
     {
         var user = _userRepository.GetUsers().FirstOrDefault(o => o.Name == model.Username);
 
@@ -76,6 +75,7 @@ public class LoginController : Controller
         }
         else
         {
+            Authentication(model1);
             return RedirectToAction("Index", "MainMenu");
         }
     }

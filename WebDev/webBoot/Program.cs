@@ -7,12 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<UserService>();
-builder.Services.AddSingleton<ProductService>();
-builder.Services.AddSingleton<CouponService>();
+builder.Services.AddSingleton<IShoppingCartService, ShoppingCartService>();
 
 builder.Services.AddDataAccessLayer(builder.Configuration);
-
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(configureOptions =>
@@ -32,7 +29,6 @@ builder.Services.AddMvc(options =>
 {
     options.Conventions.Add(new AuthorizationConventions());
 });
-
 
 var app = builder.Build();
 

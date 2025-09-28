@@ -1,7 +1,6 @@
 ﻿using Domain;
 
 namespace DataAccess.Repository;
-
 internal class CouponRepository : ICouponRepository
 {
     private readonly WebDevDBcontext _dbContext;

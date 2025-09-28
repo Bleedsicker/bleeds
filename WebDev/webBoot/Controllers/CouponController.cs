@@ -83,5 +83,4 @@ public class CouponController : Controller
 
         return RedirectToAction(nameof(Index));
     }
-
 }

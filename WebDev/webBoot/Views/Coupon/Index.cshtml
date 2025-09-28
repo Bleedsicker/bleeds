@@ -7,18 +7,10 @@
     <h1 style="text-center"> Your Coupons </h1>
 
     <div class="d-flex justify-content-center gap-3 mt-4">
-
-        <br />
-        <br />
-
         @foreach (var coupon in Model)
         {
             @Html.ActionLink(coupon.CouponName, "EditCoupon", "Coupon", new { id = coupon.Id })
-            <br />
-            <br />
             @Html.ActionLink("delete coupons", "DeleteCoupon", "Coupon", new { id = coupon.Id })
-
         }
-
     </div>
 </div>

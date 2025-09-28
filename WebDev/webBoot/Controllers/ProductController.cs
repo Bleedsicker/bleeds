@@ -3,13 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using WebDev.Models;
 using Domain;
 
-
 namespace WebDev.Controllers;
 
 public class ProductController : Controller
 {
     private IProductRepository _productRepository;
-
     public ProductController(IProductRepository productRepository)
     {
         _productRepository = productRepository;
@@ -20,7 +18,6 @@ public class ProductController : Controller
     {
         return View();
     }
-
 
     [HttpPost]
     public IActionResult AddProduct(ProductModel model)
@@ -85,5 +82,4 @@ public class ProductController : Controller
 
         return RedirectToAction(nameof(Index));
     }
-
 }
