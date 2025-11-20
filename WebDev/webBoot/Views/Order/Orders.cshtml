@@ -1,0 +1,33 @@
+﻿@model Domain.Order
+
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<h2>Orders</h2>
+
+@if (Model.OrderProducts == null)
+{
+    <div class="text-center text-muted">No Orders</div>
+}
+else
+{
+    <div class="container">
+        <div class="row justify-content-center">
+            @foreach (var order in Model.OrderProducts)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm border-0 rounded-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-text text-muted">ProductId: @order.ProductId</h5>
+                            <p class="card-text text-muted">Price: @order.UnitPrice</p>
+                            <p class="card-text text-muted">Quantity: @order.Quantity </p>
+                            <p class="card-text text-muted">Order date: @order.Order.OrderDate</p>
+                            <p class="card-text text-muted">Order Id: @order.Order.OrderId</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

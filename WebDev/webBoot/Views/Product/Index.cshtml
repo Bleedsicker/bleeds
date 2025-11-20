@@ -1,26 +1,47 @@
 ﻿@model List<ProductModel>
-<h1 style="text-center"> Welcome to the Product Menu </h1>
 
-<div class="d-flex justify-content-center gap-3 mt-4">
-    @Html.ActionLink("Add products", "AddProduct", "Product", null, new { @class = "btn btn-primary" })
+<h1 class="text-center mb-4">Welcome to the Product Menu</h1>
 
-    @Html.ActionLink("ShoppingCart", "Index", "ShoppingCart", null, new { @class = "btn btn-primary" })
-
-    <h1 style="text-center"> Your Products </h1>
-
-    <div class="d-flex justify-content-center gap-3 mt-4">
-
-        <br />
-        <br />
-
-        @foreach (var product in Model)
-        {
-            @Html.ActionLink(product.ProductName, "EditProduct", "Product", new { id = product.ProductId })
-          
-            @Html.ActionLink("Delete products", "DeleteProduct", "Product", new { id = product.ProductId })
-
-            @Html.ActionLink("Add to cart", "AddToCart", "ShoppingCart", new { id = product.ProductId })
-        }
-
-    </div>
+<div class="d-flex justify-content-center gap-3 mb-5">
+    @Html.ActionLink("Add Products", "AddProduct", "Product", null, new { @class = "btn btn-primary btn-lg px-4" })
+    @Html.ActionLink("Shopping Cart", "Index", "ShoppingCart", null, new { @class = "btn btn-primary btn-lg px-4" })
 </div>
+
+<h2 class="text-center mb-3">Your Products</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="text-center text-muted">No products</div>
+}
+else
+{
+    <div class="container">
+        <div class="row justify-content-center">
+            @foreach (var product in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm border-0 rounded-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-primary">@product.ProductName</h5>
+                            <p class="card-text text-muted">ID: @product.ProductId</p>
+
+                            <div class="d-flex justify-content-center gap-2 mt-3">
+                                @Html.ActionLink("Edit", "EditProduct", "Product",
+                                new { id = product.ProductId },
+                                                new { @class = "btn btn-outline-warning btn-sm" })
+
+                        @Html.ActionLink("Delete", "DeleteProduct", "Product",
+                                                new { id = product.ProductId },
+                                                new { @class = "btn btn-outline-danger btn-sm" })
+
+                        @Html.ActionLink("Add to Cart", "AddToCart", "ShoppingCart",
+                                                new { productId = product.ProductId },
+                                                new { @class = "btn btn-success btn-sm" })
+                    </div>
+                </div>
+            </div>
+        </div>
+                }
+        </div>
+    </div>
+}

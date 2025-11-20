@@ -23,7 +23,6 @@ public static class DataAccessConfiguration
 
         services.AddScoped<IOrderRepository, OrderRepository>();
 
-
         return services;
     }
 }

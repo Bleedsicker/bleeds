@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repository;
 internal class OrderRepository: IOrderRepository
@@ -16,8 +17,20 @@ internal class OrderRepository: IOrderRepository
         _dbContext.SaveChanges();
     }
 
-    public List<Order> GetOrders()
+    public List<Order> GetOrders(long userId)
     {
-        return _dbContext.Orders.ToList();
+        return _dbContext.Orders
+            .Where(o => o.UserId == userId)
+            .Include(op => op.OrderProducts)
+            .Include(o => o.User)
+            .ToList();
+    }
+
+    public Order GetOrder(long id)
+    {
+        return _dbContext.Orders
+            .Include(o => o.OrderProducts)
+            .ThenInclude(op => op.Product)
+            .FirstOrDefault(o => o.OrderId == id);
     }
 }

@@ -44,13 +44,15 @@ public class LoginController : Controller
         }
         else
         {
-            _userRepository.AddUser(new User
+            var user = new User
             {
                 Password = model.Password,
                 Name = model.Username
-            });
+            };
 
-            Authentication(model);
+            user = _userRepository.AddUser(user);
+
+            Authentication(user.Id, user.Name);
 
             return RedirectToAction(nameof(Login));
         }
@@ -63,7 +65,7 @@ public class LoginController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login(LoginModel model, RegisterModel model1)
+    public async Task<IActionResult> Login(LoginModel model)
     {
         var user = _userRepository.GetUsers().FirstOrDefault(o => o.Name == model.Username);
 
@@ -75,15 +77,18 @@ public class LoginController : Controller
         }
         else
         {
-            Authentication(model1);
+            Authentication(user.Id, user.Name);
             return RedirectToAction("Index", "MainMenu");
         }
     }
 
-    public async void Authentication(RegisterModel model)
+    private async void Authentication(long id, string username)
     {
-        var claims = new List<Claim>(); //TODO подумать реюз
-        var claimName = new Claim(ClaimTypes.Name, model.Username);
+        var claims = new List<Claim>();
+        var claimId = new Claim("UserId", id.ToString());
+        claims.Add(claimId);
+
+        var claimName = new Claim(ClaimTypes.Name, username);
         claims.Add(claimName);
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

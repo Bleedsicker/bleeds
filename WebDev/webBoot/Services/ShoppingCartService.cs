@@ -1,28 +1,45 @@
-﻿using System.Collections.Concurrent;
+﻿using DataAccess.Repository;
+using Domain;
+using System.Collections.Concurrent;
 using WebDev.Models;
+using System.Security.Claims;
 namespace WebDev.Services;
 
 public interface IShoppingCartService
 {
-    public void AddToCart(string userId, long productId, string productName, string productDescription, decimal price);
+    public void AddToCart(long userId, long productId, IProductRepository _productRepository);
 
-    public void RemoveFromCart(string userId, long productId);
+    public void RemoveFromCart(long userId, long productId);
 
-    ShoppingCartModel GetCart(string userId);
+    ShoppingCartModel GetCart(long userId);
 
-    public void ClearCart(string userId);
+    public void ClearCart(long userId);
+
+    public long GetUserId();
 }
 
 public class ShoppingCartService : IShoppingCartService
 {
-    private readonly ConcurrentDictionary<string, ShoppingCartModel> _carts = new();
+    private readonly ConcurrentDictionary<long, ShoppingCartModel> _carts = new();
+    private readonly IHttpContextAccessor _HttpContextAccessor;
 
-
-    public void AddToCart(string userId , long productId, string productName, string productDescription, decimal price)
+    public ShoppingCartService(IHttpContextAccessor httpContextAccessor)
     {
+        _HttpContextAccessor = httpContextAccessor;
+    }
+
+    public void AddToCart(long userId, long productId, IProductRepository _productRepository)
+    {
+        var product = _productRepository.GetProduct(productId);
+        if (product == null) return;
 
         var cart = _carts.GetOrAdd(userId, new ShoppingCartModel { UserId = userId });
+        if (cart == null)
+        {
+            cart = new ShoppingCartModel();
+        }
         var existingItem = cart.Items.FirstOrDefault(item => item.ProductId == productId);
+
         if (existingItem != null)
         {
             existingItem.Quantity++;
@@ -31,16 +48,16 @@ public class ShoppingCartService : IShoppingCartService
         {
             cart.Items.Add(new ShoppingCartItemModel
             {
-                ProductId = productId,
-                ProductName = productName,
-                ProductDescription = productDescription,
-                Price = price,
+                ProductId = product.Id,
+                ProductName = product.Name,
+                ProductDescription = product.Description,
+                Price = product.Price,
                 Quantity = 1
             });
         }
     }
 
-    public void RemoveFromCart(string userId, long productId)
+    public void RemoveFromCart(long userId, long productId)
     {
         if (_carts.TryGetValue(userId, out var cart))
         {
@@ -58,7 +75,7 @@ public class ShoppingCartService : IShoppingCartService
         }
     }
 
-    public ShoppingCartModel GetCart(string userId)
+    public ShoppingCartModel GetCart(long userId)
     {
         if (_carts.TryGetValue(userId, out var cart))
         {
@@ -67,13 +84,23 @@ public class ShoppingCartService : IShoppingCartService
         return new ShoppingCartModel { UserId = userId };
     }
 
-    public void ClearCart(string userId)
+    public void ClearCart(long userId)
     {
         _carts.TryRemove(userId, out _);
     }
 
-    //public decimal TotalPrice()
-    //{
-    //    return _shoppingCart.Sum(item => item.Price * item.Quantity);
-    // }
+    public long GetUserId()
+    {
+        var httpContext = _HttpContextAccessor.HttpContext;
+        if (httpContext.User.Identity.IsAuthenticated)
+        {
+            var userIdClaim = httpContext.User.Claims.FirstOrDefault(o => o.Type == "UserId");
+            if (userIdClaim != null && long.TryParse(userIdClaim.Value, out var userId))
+            {
+                return userId;
+            }
+        }
+
+        throw new UnauthorizedAccessException();
+    }
 }

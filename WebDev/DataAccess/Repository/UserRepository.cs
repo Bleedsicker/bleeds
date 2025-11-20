@@ -11,10 +11,11 @@ internal class UserRepository : IUserRepository
         _dbContext = dBContext;
     }
 
-    public void AddUser(User user)
+    public User AddUser(User user)
     {
-        _dbContext.Users.Add(user);
+        var newUser = _dbContext.Users.Add(user);
         _dbContext.SaveChanges();
+        return newUser.Entity;
     }
 
     public List<User> GetUsers()

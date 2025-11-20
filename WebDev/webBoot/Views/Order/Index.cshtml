@@ -1,1 +1,40 @@
-﻿
+﻿@model IEnumerable<Domain.Order>
+
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<h2>Orders</h2>
+
+@if (Model == null)
+{
+    <div class="text-center text-muted">No Orders</div>
+}
+else
+{
+    <div class="container">
+        <div class="row justify-content-center">
+            @foreach (var order in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm border-0 rounded-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-text text-muted">Username: @order.User.Name</h5>
+                            <p class="card-text text-muted">UserId: @order.UserId</p>
+                            <p class="card-text text-muted">OrderId: @order.OrderId </p>
+                            <p class="card-text text-muted">Order date: @order.OrderDate</p
+
+                                <div class="row mt-4">
+            <div class="col text-center">
+                <a asp-controller="Order" asp-action="Orders"
+                asp-route-id="@order.OrderId"
+                   class="btn btn-primary btn-lg">Show order</a>
+            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            }
+                </div>
+        </div>
+}

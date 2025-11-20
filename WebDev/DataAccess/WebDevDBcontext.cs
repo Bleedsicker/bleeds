@@ -45,6 +45,7 @@ internal class WebDevDBcontext : DbContext
             .HasKey(o => o.OrderId);
 
         modelBuilder.Entity<OrderProduct>()
+            .ToTable("OrderProduct")
             .HasKey(o => new { o.OrderId, o.ProductId });
 
         modelBuilder.Entity<OrderProduct>()
