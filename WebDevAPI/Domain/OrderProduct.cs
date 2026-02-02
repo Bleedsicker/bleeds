@@ -11,5 +11,6 @@ public class OrderProduct
     public long Quantity { get; set; }
 
     public Order Order { get; set; }
+
     public Product Product { get; set; }
 }

@@ -78,5 +78,4 @@ public class CouponController : Controller
         _couponRepository.DeleteCoupon(id);
         return Ok();
     }
-
 }

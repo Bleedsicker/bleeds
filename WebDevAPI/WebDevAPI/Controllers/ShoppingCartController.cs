@@ -83,7 +83,6 @@ public class ShoppingCartController : Controller
         return Ok();
     }
 
-
     public record AddToCartDto(long UserId, long ProductId);
     public record RemoveFromCartDto(long UserId, long ProductId);
     public record ClearCartDto(long UserId);

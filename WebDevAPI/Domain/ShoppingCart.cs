@@ -11,5 +11,4 @@ public class ShoppingCart
     public decimal Price { get; set; }
 
     public long Quantity { get; set; }
-
 }
