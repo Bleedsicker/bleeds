@@ -9,4 +9,6 @@ public class LoginModel
 
     [StringLength(100, MinimumLength = 5, ErrorMessage = "Password too short")]
     public string Password { get; set; }
+
+    public long Id { get; set; }
 }

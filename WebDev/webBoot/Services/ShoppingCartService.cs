@@ -1,92 +1,65 @@
-﻿using DataAccess.Repository;
-using Domain;
-using System.Collections.Concurrent;
-using WebDev.Models;
-using System.Security.Claims;
+﻿using WebDev.Models;
 namespace WebDev.Services;
 
 public interface IShoppingCartService
 {
-    public void AddToCart(long userId, long productId, IProductRepository _productRepository);
+    Task AddToCart(long userId, long productId);
 
-    public void RemoveFromCart(long userId, long productId);
+    Task RemoveFromCart(long userId, long productId);
 
-    ShoppingCartModel GetCart(long userId);
+    Task<ShoppingCartModel> GetCart(long userId);
 
-    public void ClearCart(long userId);
+    Task ClearCart(long userId);
 
-    public long GetUserId();
+    long GetUserId();
 }
 
 public class ShoppingCartService : IShoppingCartService
 {
-    private readonly ConcurrentDictionary<long, ShoppingCartModel> _carts = new();
+    private readonly HttpClient _httpClient;
     private readonly IHttpContextAccessor _HttpContextAccessor;
 
-    public ShoppingCartService(IHttpContextAccessor httpContextAccessor)
+    public ShoppingCartService(IHttpContextAccessor httpContextAccessor, HttpClient httpClient)
     {
         _HttpContextAccessor = httpContextAccessor;
+        _httpClient = httpClient;
     }
 
-    public void AddToCart(long userId, long productId, IProductRepository _productRepository)
+    public async Task AddToCart(long userId, long productId)
     {
-        var product = _productRepository.GetProduct(productId);
-        if (product == null) return;
-
-        var cart = _carts.GetOrAdd(userId, new ShoppingCartModel { UserId = userId });
-        if (cart == null)
+        var response = await _httpClient.PostAsJsonAsync("/ShoppingCart/AddToCart", new
         {
-            cart = new ShoppingCartModel();
-        }
-        var existingItem = cart.Items.FirstOrDefault(item => item.ProductId == productId);
-
-        if (existingItem != null)
+            userId,
+            productId
+        });
+        response.EnsureSuccessStatusCode();
+    }
+    
+    public async Task RemoveFromCart(long userId, long productId)
+    {
+        var response = await _httpClient.PostAsJsonAsync("/ShoppingCart/RemoveFromCart", new
         {
-            existingItem.Quantity++;
-        }
-        else
-        {
-            cart.Items.Add(new ShoppingCartItemModel
-            {
-                ProductId = product.Id,
-                ProductName = product.Name,
-                ProductDescription = product.Description,
-                Price = product.Price,
-                Quantity = 1
-            });
-        }
+            userId,
+            productId
+        });
+        response.EnsureSuccessStatusCode();
     }
 
-    public void RemoveFromCart(long userId, long productId)
+    public async Task<ShoppingCartModel> GetCart(long userId)
     {
-        if (_carts.TryGetValue(userId, out var cart))
-        {
-            var removeItem = cart.Items.FirstOrDefault(item => item.ProductId == productId);
+        var cart = await _httpClient.GetFromJsonAsync<ShoppingCartModel>($"/ShoppingCart/GetCart?userId={userId}");
 
-            if (removeItem != null)
-            {
-                cart.Items.Remove(removeItem);
-            }
-        }
-
-        if (!cart.Items.Any())
-        {
-            _carts.TryRemove(userId, out _);
-        }
+        return cart ?? new ShoppingCartModel { UserId = userId };
     }
 
-    public ShoppingCartModel GetCart(long userId)
+    public async Task ClearCart(long userId)
     {
-        if (_carts.TryGetValue(userId, out var cart))
+        var response = await _httpClient.PostAsJsonAsync("/ShoppingCart/ClearCart", new
         {
-            return cart;
-        }
-        return new ShoppingCartModel { UserId = userId };
-    }
+            userId
+        });
 
-    public void ClearCart(long userId)
-    {
-        _carts.TryRemove(userId, out _);
+        response.EnsureSuccessStatusCode();
     }
 
     public long GetUserId()

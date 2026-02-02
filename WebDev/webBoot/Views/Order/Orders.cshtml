@@ -1,4 +1,4 @@
-﻿@model Domain.Order
+﻿@model OrderDto
 
 @{
     ViewData["Title"] = "Orders";
@@ -22,8 +22,8 @@ else
                             <h5 class="card-text text-muted">ProductId: @order.ProductId</h5>
                             <p class="card-text text-muted">Price: @order.UnitPrice</p>
                             <p class="card-text text-muted">Quantity: @order.Quantity </p>
-                            <p class="card-text text-muted">Order date: @order.Order.OrderDate</p>
-                            <p class="card-text text-muted">Order Id: @order.Order.OrderId</p>
+                            <p class="card-text text-muted">Order date: @Model.OrderDate</p>
+                            <p class="card-text text-muted">Order Id: @Model.OrderId</p>
                         </div>
                     </div>
                 </div>

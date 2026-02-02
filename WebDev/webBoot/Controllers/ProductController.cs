@@ -1,16 +1,18 @@
-﻿using DataAccess.Repository;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using System.Text.Json;
+using WebDev.Configuration;
+using WebDev.Dto;
 using WebDev.Models;
-using Domain;
 
 namespace WebDev.Controllers;
 
 public class ProductController : Controller
 {
-    private IProductRepository _productRepository;
-    public ProductController(IProductRepository productRepository)
+    private readonly ApiSettings _apiSettings;
+    public ProductController(ApiSettings apiSettings)
     {
-        _productRepository = productRepository;
+        _apiSettings = apiSettings;
     }
 
     [HttpGet]
@@ -20,66 +22,111 @@ public class ProductController : Controller
     }
 
     [HttpPost]
-    public IActionResult AddProduct(ProductModel model)
+    public async Task<IActionResult> AddProduct(ProductModel model)
     {
-        _productRepository.AddProduct(new Product
+        var productDto = new ProductDto
         {
             Name = model.ProductName,
             Description = model.ProductDescription,
-            Price = model.Price
-        });
+            Price = model.Price,
+            Id = model.ProductId,
+        };
 
-        return RedirectToAction(nameof(Index));
+        var httpClient = new HttpClient();
+        var json = JsonSerializer.Serialize(productDto);
+        var httpContent = new StringContent(json,
+                Encoding.UTF8,
+                "application/json");
+
+        var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/Product/AddProduct", httpContent);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            ModelState.AddModelError("", "registration is failed");
+            return View(model);
+        }
+        else
+        {
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     [HttpGet]
-    public IActionResult EditProduct(long id)
+    public IActionResult EditProduct(ProductDto productDto)
     {
-        var product = _productRepository.GetProduct(id);
+
         var productModel = new ProductModel
         {
-            ProductName = product.Name,
-            ProductDescription = product.Description,
-            Price = product.Price,
-            ProductId = product.Id
+            ProductName = productDto.Name,
+            ProductDescription = productDto.Description,
+            Price = productDto.Price,
+            ProductId = productDto.Id
         };
         return View(productModel);
     }
 
     [HttpPost]
-    public IActionResult EditProduct(ProductModel model)
+    public async Task<IActionResult> EditProduct(ProductModel model)
     {
-        var product = _productRepository.GetProduct(model.ProductId.Value);
-        product.Name = model.ProductName;
-        product.Description = model.ProductDescription;
-        product.Price = model.Price;
-        _productRepository.UpdateProduct(product);
+        var productDto = new ProductDto
+        {
+            Name = model.ProductName,
+            Price = model.Price,
+            Id = model.ProductId,
+            Description = model.ProductDescription,
+        };
 
-        return RedirectToAction(nameof(Index));
+        var httpClient = new HttpClient();
+        var json = JsonSerializer.Serialize(productDto);
+        var httpContent = new StringContent(json,
+                Encoding.UTF8,
+                "application/json");
+        var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/Product/EditProduct", httpContent);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            ModelState.AddModelError("", "Edit is failed");
+            return View(model);
+        }
+        else
+        {
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var products = _productRepository.GetProducts();
-        var result = new List<ProductModel>();
-        foreach (var product in products)
+        var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync($"{_apiSettings.BaseUrl}/Product/GetProducts");
+        if (!response.IsSuccessStatusCode)
         {
-            result.Add(new ProductModel
-            {
-                ProductName = product.Name,
-                ProductDescription = product.Description,
-                Price = product.Price,
-                ProductId = product.Id
-            });
+            return View(new List<ProductModel>());
         }
+        var json = await response.Content.ReadAsStringAsync();
+
+        var productsDto = JsonSerializer.Deserialize<List<ProductDto>>(json, JsonOptions());
+        var result = productsDto.Select(o => new ProductModel
+        {
+            ProductId = o.Id,
+            Price = o.Price,
+            ProductDescription = o.Description,
+            ProductName = o.Name,
+        }).ToList();
 
         return View(result);
     }
-    public IActionResult DeleteProduct(long id)
+
+    public async Task<IActionResult> DeleteProduct(long id)
     {
-        _productRepository.DeleteProduct(id);
+        var httpClient = new HttpClient();
+        await httpClient.DeleteAsync($"{_apiSettings.BaseUrl}/Product/DeleteProduct/{id}");
 
         return RedirectToAction(nameof(Index));
     }
+
+    private static JsonSerializerOptions JsonOptions() => new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
 }

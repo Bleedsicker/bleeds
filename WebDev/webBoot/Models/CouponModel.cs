@@ -13,5 +13,5 @@ public class CouponModel
     [Required(ErrorMessage = "Id is empty")]
     public string CouponId { get; set; }
 
-    public long? Id { get; set; }
+    public long Id { get; set; }
 }

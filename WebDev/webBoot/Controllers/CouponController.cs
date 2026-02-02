@@ -1,32 +1,43 @@
-﻿using DataAccess.Repository;
-using Domain;
+﻿
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using System.Text.Json;
+using WebDev.Configuration;
+using WebDev.Dto;
 using WebDev.Models;
 
 namespace WebDev.Controllers;
 public class CouponController : Controller
 {
-    private ICouponRepository _couponRepository;
-
-    public CouponController(ICouponRepository couponRepository)
+    private readonly ApiSettings _apiSettings;
+    public CouponController(ApiSettings apiSettings)
     {
-        _couponRepository = couponRepository;
+        _apiSettings = apiSettings;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var coupons = _couponRepository.GetCoupons();
-        var result = new List<CouponModel>();
-        foreach (var coupon in coupons)
+        var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync($"{_apiSettings.BaseUrl}/Coupon/GetCoupons");
+        if (!response.IsSuccessStatusCode)
         {
-            result.Add(new CouponModel
-            {
-                CouponName = coupon.CouponName,
-                CouponId = coupon.CouponId,
-                Id = coupon.Id,
-                CouponDiscount = coupon.CouponDiscount
-            });
+            return View(new List<CouponModel>());
         }
+        var json = await response.Content.ReadAsStringAsync();
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        var couponsDto = JsonSerializer.Deserialize<List<CouponDto>>(json, options) ?? new();
+        var result = couponsDto.Select(o => new CouponModel
+        {
+            CouponName = o.CouponName,
+            CouponId = o.CouponId,
+            CouponDiscount = o.CouponDiscount,
+            Id = o.Id,
+        }).ToList();
 
         return View(result);
     }
@@ -38,48 +49,83 @@ public class CouponController : Controller
     }
 
     [HttpPost]
-    public IActionResult AddCoupon(CouponModel model)
+    public async  Task<IActionResult> AddCoupon(CouponModel model)
     {
-        _couponRepository.AddCoupon(new Coupon
+        var couponDto = new CouponDto
         {
             CouponName = model.CouponName,
             CouponId = model.CouponId,
-            CouponDiscount= model.CouponDiscount,
-        });
+            CouponDiscount = model.CouponDiscount,
+            Id = model.Id
+        };
 
-        return RedirectToAction(nameof(Index));
+        var httpClient = new HttpClient();
+        var json = JsonSerializer.Serialize(couponDto);
+        var httpContent = new StringContent(json,
+                Encoding.UTF8,
+                "application/json");
+
+        var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/Coupon/AddCoupon", httpContent);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            ModelState.AddModelError("", "registration is failed");
+            return View(model);
+        }
+        else
+        {
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     [HttpGet]
-    public IActionResult EditCoupon(long id)
+    public IActionResult EditCoupon(CouponDto couponDto)
     {
-        var coupon = _couponRepository.GetCoupon(id);
+      
         var couponModel = new CouponModel
         {
-            CouponName = coupon.CouponName,
-            CouponId = coupon.CouponId,
-            CouponDiscount = coupon.CouponDiscount,
-            Id = coupon.Id
+            CouponName = couponDto.CouponName,
+            CouponId = couponDto.CouponId,
+            CouponDiscount = couponDto.CouponDiscount,
+            Id = couponDto.Id
         };
         return View(couponModel);
     }
 
     [HttpPost]
-    public IActionResult EditCoupon(CouponModel model)
+    public async Task<IActionResult> EditCoupon(CouponModel model)
     {
-        var coupon = _couponRepository.GetCoupon(model.Id.Value);
-        coupon.CouponName = model.CouponName;
-        coupon.CouponId = model.CouponId;
-        coupon.CouponDiscount = model.CouponDiscount;
-        _couponRepository.UpdateCoupon(coupon);
+        var couponDto = new CouponDto
+        {
+            CouponName = model.CouponName,
+            CouponId = model.CouponId,
+            CouponDiscount = model.CouponDiscount,
+            Id= model.Id
+        };
 
-        return RedirectToAction(nameof(Index));
+        var httpClient = new HttpClient();
+        var json = JsonSerializer.Serialize(couponDto);
+        var httpContent = new StringContent(json,
+                Encoding.UTF8,
+                "application/json");
+
+        var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/Coupon/AddCoupon", httpContent);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            ModelState.AddModelError("", "registration is failed");
+            return View(model);
+        }
+        else
+        {
+            return RedirectToAction(nameof(Index));
+        }
     }
 
-    [HttpGet]
-    public IActionResult DeleteCoupon(long id)
+    public async Task<IActionResult> DeleteCoupon(long id)
     {
-        _couponRepository.DeleteCoupon(id);
+        var httpClient = new HttpClient();
+        await httpClient.DeleteAsync($"{_apiSettings.BaseUrl}/Coupon/DeleteCoupon/{id}");
 
         return RedirectToAction(nameof(Index));
     }

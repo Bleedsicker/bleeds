@@ -1,69 +1,91 @@
-﻿using DataAccess.Repository;
-using Domain;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text;
+using System.Text.Json;
+using WebDev.Configuration;
+using WebDev.Dto;
 using WebDev.Services;
 
 namespace WebDev.Controllers
 {
     public class OrderController : Controller
     {
-        private IShoppingCartService _shoppingCart;
-        private IOrderRepository _orderRepository;
-        public OrderController(IOrderRepository orderRepository, IShoppingCartService shoppingCart)
+        private readonly ApiSettings _apiSettings;
+        private readonly IShoppingCartService _shoppingCartService;
+
+        public OrderController(ApiSettings apiSettings, IShoppingCartService shoppingCartService)
         {
-            _orderRepository = orderRepository;
-            _shoppingCart = shoppingCart;
+            _apiSettings = apiSettings;
+            _shoppingCartService = shoppingCartService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var userId = _shoppingCart.GetUserId();
-            var orders = _orderRepository.GetOrders(userId);
-            return View(orders);
+            var userId = _shoppingCartService.GetUserId();
+
+            var httpClient = new HttpClient();
+            var response = await httpClient.GetAsync($"{_apiSettings.BaseUrl}/Order/GetOrders?userId={userId}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return View(new List<OrderDto>());
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var orders = JsonSerializer.Deserialize<List<OrderDto>>(json, JsonOptions());
+
+            return View(orders ?? new List<OrderDto>());
         }
 
-        public IActionResult Orders(long id)
+        public async Task<IActionResult> Orders(long id)
         {
-            var order = _orderRepository.GetOrder(id);
+            var httpClient = new HttpClient();
+            var response = await httpClient.GetAsync($"{_apiSettings.BaseUrl}/Order/GetOrder?id={id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return NotFound();
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var order = JsonSerializer.Deserialize<OrderDto>(json, JsonOptions());
+
             return View(order);
         }
 
         [HttpGet]
-        public IActionResult AddOrder()
+        public async Task<IActionResult> AddOrder()
         {
-            var userId = _shoppingCart.GetUserId();
-            var cart = _shoppingCart.GetCart(userId);
-            if (cart == null)
-            {
-                RedirectToAction("Index", "ShoppingCart");
-            }
+            var userId = _shoppingCartService.GetUserId();
+            var cart = await _shoppingCartService.GetCart(userId);
+
+            if (cart == null || cart.Items == null || !cart.Items.Any())
+                return RedirectToAction("Index", "ShoppingCart");
+
             return View();
         }
 
         [HttpPost]
-        public IActionResult PostOrder()
+        public async Task<IActionResult> PostOrder()
         {
-            var userId = _shoppingCart.GetUserId();
-            var cart = _shoppingCart.GetCart(userId);
-            if (cart == null)
+            var userId = _shoppingCartService.GetUserId();
+
+            var httpClient = new HttpClient();
+            var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/Order/PostOrder?userId={userId}",
+                new StringContent("{}", Encoding.UTF8, "application/json"));
+
+            if (!response.IsSuccessStatusCode)
             {
                 return RedirectToAction("Index", "ShoppingCart");
             }
 
-            var order = new Order();
-            order.UserId = userId;
-            order.OrderDate = DateTime.Now;
-            order.OrderProducts = cart.Items.Select(item => new OrderProduct
-            {
-                ProductId = item.ProductId,
-                Quantity = item.Quantity,
-                UnitPrice = item.Price,
-            }).ToList();
-
-            _orderRepository.AddOrder(order);
-            _shoppingCart.ClearCart(userId);
+            await _shoppingCartService.ClearCart(userId);
 
             return RedirectToAction("Index", "Order");
         }
+
+        private static JsonSerializerOptions JsonOptions() => new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
     }
 }

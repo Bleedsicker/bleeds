@@ -1,82 +1,52 @@
-﻿using DataAccess.Repository;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using WebDev.Configuration;
 using WebDev.Services;
 
 namespace WebDev.Controllers
 {
     public class ShoppingCartController : Controller
     {
-        private IShoppingCartService _shoppingCart;
+        private readonly IShoppingCartService _shoppingCart;
 
-        private IProductRepository _productRepository;
-
-        public ShoppingCartController(IShoppingCartService shoppingCart, IProductRepository productRepository)
+        public ShoppingCartController(IShoppingCartService shoppingCart)
         {
             _shoppingCart = shoppingCart;
-            _productRepository = productRepository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var userId = _shoppingCart.GetUserId();
-            var cart = _shoppingCart.GetCart(userId);
+            var cart = await _shoppingCart.GetCart(userId);
             return View(cart);
         }
 
-        //public long GetUserId()
-        //{
-
-        //    if (HttpContext.User.Identity.IsAuthenticated)
-        //    {
-        //        if (string.IsNullOrWhiteSpace(User.Identity.Name) == false)
-        //        {
-        //            return int.Parse(User.Identity.Name);
-        //        }
-        //    }
-
-        //    throw new UnauthorizedAccessException();
-        //}
 
         [HttpGet]
-        public IActionResult AddToCart(long productId)
+        public async Task<IActionResult> AddToCart(long productId)
         {
-            var product = _productRepository.GetProduct(productId);
 
             var userId = _shoppingCart.GetUserId();
-            _shoppingCart.AddToCart(userId, productId, _productRepository);
+            await _shoppingCart.AddToCart(userId, productId);
 
             return RedirectToAction("Index");
         }
 
-        public IActionResult RemoveFromCart(long productId)
+        public async Task<IActionResult> RemoveFromCart(long productId)
         {
             var userId = _shoppingCart.GetUserId();
-            _shoppingCart.RemoveFromCart(userId, productId);
+            await _shoppingCart.RemoveFromCart(userId, productId);
 
             return RedirectToAction("Index");
         }
 
-        public IActionResult ClearCart()
+        public async Task<IActionResult> ClearCart()
         {
             var userId = _shoppingCart.GetUserId();
-            _shoppingCart.ClearCart(userId);
+            await _shoppingCart.ClearCart(userId);
 
             return RedirectToAction("Index");
         }
-        
-        //[HttpPost]
-        //public IActionResult CreateOrder(Order order)
-        //{
-        //    var userId = GetUserId();
-        //    var cart = _shoppingCart.GetCart(userId);
-        //    if (!cart.Items.Any())
-        //    {
-        //        return RedirectToAction("Index");
-        //    }
-        //    order.UserId = userId;
-        //}
-
 
     }
 }

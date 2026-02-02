@@ -1,20 +1,22 @@
-﻿using DataAccess.Repository;
-using Domain;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
+using WebDev.Configuration;
+using WebDev.Dto;
 using WebDev.Models;
 
 namespace WebDev.Controllers;
 
 public class LoginController : Controller
 {
-    private IUserRepository _userRepository;
+    private readonly ApiSettings _apiSettings;
 
-    public LoginController(IUserRepository userRepository)
+    public LoginController(ApiSettings apiSettings)
     {
-        _userRepository = userRepository;
+        _apiSettings = apiSettings;
     }
 
     [HttpGet]
@@ -32,7 +34,7 @@ public class LoginController : Controller
     [HttpPost]
     public async Task<IActionResult> Register(RegisterModel model)
     {
-        if(!ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
             return View(model);
         }
@@ -44,15 +46,30 @@ public class LoginController : Controller
         }
         else
         {
-            var user = new User
+            var userDto = new UserDto
             {
+                Username = model.Username,
                 Password = model.Password,
-                Name = model.Username
             };
 
-            user = _userRepository.AddUser(user);
+            var httpClient = new HttpClient();
 
-            Authentication(user.Id, user.Name);
+            var json = JsonSerializer.Serialize(userDto);
+            var httpContent = new StringContent(json,
+                Encoding.UTF8,
+                "application/json");
+
+            var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/User/Register", httpContent);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ModelState.AddModelError("", "registration is failed");
+                return View(model);
+            }
+
+            var user = await response.Content.ReadFromJsonAsync<UserDto>();
+
+            Authentication(user.Id, user.Username);
 
             return RedirectToAction(nameof(Login));
         }
@@ -67,9 +84,23 @@ public class LoginController : Controller
     [HttpPost]
     public async Task<IActionResult> Login(LoginModel model)
     {
-        var user = _userRepository.GetUsers().FirstOrDefault(o => o.Name == model.Username);
+        var httpClient = new HttpClient();
 
-        if (user != null && user.Password != model.Password)
+        var json = JsonSerializer.Serialize(model);
+        var httpContent = new StringContent(json,
+            Encoding.UTF8,
+            "application/json");
+
+        var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/User/GetUser", httpContent);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+        {
+            ModelState.AddModelError("Password", "Wrong Password");
+
+            return View(model);
+        }
+        else if (response.StatusCode == System.Net.HttpStatusCode.NotFound &&
+            response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
         {
             ModelState.AddModelError("Password", "Wrong Password");
 
@@ -77,7 +108,10 @@ public class LoginController : Controller
         }
         else
         {
-            Authentication(user.Id, user.Name);
+            var user = await response.Content.ReadFromJsonAsync<UserDto>();
+
+            Authentication(user.Id, user.Username);
+
             return RedirectToAction("Index", "MainMenu");
         }
     }

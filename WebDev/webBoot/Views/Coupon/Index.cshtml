@@ -1,16 +1,25 @@
 ﻿@model List<CouponModel>
 <h1 style="text-center"> Welcome to the Coupon Menu </h1>
 
-<div class="d-flex justify-content-center gap-3 mt-4">
+<div class="d-flex justify-content-center gap-3 mb-5">
     @Html.ActionLink("Add coupons", "AddCoupon", "Coupon", null, new { @class = "btn btn-primary" })
+</div>
 
+<div
     <h1 style="text-center"> Your Coupons </h1>
 
     <div class="d-flex justify-content-center gap-3 mt-4">
-        @foreach (var coupon in Model)
+        @if (Model == null || !Model.Any())
         {
-            @Html.ActionLink(coupon.CouponName, "EditCoupon", "Coupon", new { id = coupon.Id })
-            @Html.ActionLink("delete coupons", "DeleteCoupon", "Coupon", new { id = coupon.Id })
+                <div class="text-center text-muted">No coupons yet</div>
+        }
+        else
+        {
+                @foreach (var coupon in Model)
+                {
+                        @Html.ActionLink(coupon.CouponName, "EditCoupon", "Coupon", new { id = coupon.Id })
+                        @Html.ActionLink("Delete", "DeleteCoupon", "Coupon", new { id = coupon.Id })
+                }
         }
     </div>
 </div>
