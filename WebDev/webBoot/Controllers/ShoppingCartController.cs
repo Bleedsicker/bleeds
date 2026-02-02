@@ -8,19 +8,16 @@ namespace WebDev.Controllers
     public class ShoppingCartController : Controller
     {
         private readonly IShoppingCartService _shoppingCart;
-
         public ShoppingCartController(IShoppingCartService shoppingCart)
         {
             _shoppingCart = shoppingCart;
         }
-
         public async Task<IActionResult> Index()
         {
             var userId = _shoppingCart.GetUserId();
             var cart = await _shoppingCart.GetCart(userId);
             return View(cart);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> AddToCart(long productId)
@@ -39,7 +36,6 @@ namespace WebDev.Controllers
 
             return RedirectToAction("Index");
         }
-
         public async Task<IActionResult> ClearCart()
         {
             var userId = _shoppingCart.GetUserId();
@@ -47,6 +43,5 @@ namespace WebDev.Controllers
 
             return RedirectToAction("Index");
         }
-
     }
 }

@@ -13,7 +13,6 @@ namespace WebDev.Controllers;
 public class LoginController : Controller
 {
     private readonly ApiSettings _apiSettings;
-
     public LoginController(ApiSettings apiSettings)
     {
         _apiSettings = apiSettings;
@@ -115,7 +114,6 @@ public class LoginController : Controller
             return RedirectToAction("Index", "MainMenu");
         }
     }
-
     private async void Authentication(long id, string username)
     {
         var claims = new List<Claim>();
@@ -139,7 +137,6 @@ public class LoginController : Controller
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
 
     }
-
     public async Task<IActionResult> LogOut()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

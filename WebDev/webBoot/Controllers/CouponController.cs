@@ -14,7 +14,6 @@ public class CouponController : Controller
     {
         _apiSettings = apiSettings;
     }
-
     public async Task<IActionResult> Index()
     {
         var httpClient = new HttpClient();
@@ -121,7 +120,6 @@ public class CouponController : Controller
             return RedirectToAction(nameof(Index));
         }
     }
-
     public async Task<IActionResult> DeleteCoupon(long id)
     {
         var httpClient = new HttpClient();

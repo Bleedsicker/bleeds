@@ -17,7 +17,6 @@ namespace WebDev.Controllers
             _apiSettings = apiSettings;
             _shoppingCartService = shoppingCartService;
         }
-
         public async Task<IActionResult> Index()
         {
             var userId = _shoppingCartService.GetUserId();
@@ -35,7 +34,6 @@ namespace WebDev.Controllers
 
             return View(orders ?? new List<OrderDto>());
         }
-
         public async Task<IActionResult> Orders(long id)
         {
             var httpClient = new HttpClient();

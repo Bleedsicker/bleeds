@@ -116,7 +116,6 @@ public class ProductController : Controller
 
         return View(result);
     }
-
     public async Task<IActionResult> DeleteProduct(long id)
     {
         var httpClient = new HttpClient();
@@ -124,7 +123,6 @@ public class ProductController : Controller
 
         return RedirectToAction(nameof(Index));
     }
-
     private static JsonSerializerOptions JsonOptions() => new JsonSerializerOptions
     {
         PropertyNameCaseInsensitive = true
