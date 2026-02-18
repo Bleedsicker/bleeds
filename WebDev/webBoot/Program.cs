@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using WebDev.Authorization;
 using WebDev.Configuration;
+using WebDev.Interfaces;
 using WebDev.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,6 +47,13 @@ builder.Services.AddMvc(options =>
 });
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddHttpClient<IApiService, ApiService>(client =>
+{
+    client.BaseAddress = new Uri(apiSettings.BaseUrl);
+
+    client.DefaultRequestHeaders.Add("WebDev-api-key", apiSettings.ApiKey);
+});
 
 var app = builder.Build();
 

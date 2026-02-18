@@ -1,18 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using WebDev.Configuration;
 using WebDev.Dto;
+using WebDev.Interfaces;
 using WebDev.Models;
+
 
 namespace WebDev.Controllers;
 
 public class ProductController : Controller
 {
     private readonly ApiSettings _apiSettings;
-    public ProductController(ApiSettings apiSettings)
+    private readonly IApiService _apiService;
+    public ProductController(ApiSettings apiSettings, IApiService apiService)
     {
         _apiSettings = apiSettings;
+        _apiService = apiService;
     }
 
     [HttpGet]
@@ -32,13 +37,7 @@ public class ProductController : Controller
             Id = model.ProductId,
         };
 
-        var httpClient = new HttpClient();
-        var json = JsonSerializer.Serialize(productDto);
-        var httpContent = new StringContent(json,
-                Encoding.UTF8,
-                "application/json");
-
-        var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/Product/AddProduct", httpContent);
+        var response = await _apiService.PostAsync("Product/AddProduct", productDto);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -76,12 +75,7 @@ public class ProductController : Controller
             Description = model.ProductDescription,
         };
 
-        var httpClient = new HttpClient();
-        var json = JsonSerializer.Serialize(productDto);
-        var httpContent = new StringContent(json,
-                Encoding.UTF8,
-                "application/json");
-        var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/Product/EditProduct", httpContent);
+        var response = await _apiService.PostAsync("Product/EditProduct", productDto);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -97,8 +91,7 @@ public class ProductController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var httpClient = new HttpClient();
-        var response = await httpClient.GetAsync($"{_apiSettings.BaseUrl}/Product/GetProducts");
+        var response = await new HttpClient().GetAsync($"{_apiSettings.BaseUrl}/Product/GetProducts");
         if (!response.IsSuccessStatusCode)
         {
             return View(new List<ProductModel>());
@@ -116,6 +109,7 @@ public class ProductController : Controller
 
         return View(result);
     }
+
     public async Task<IActionResult> DeleteProduct(long id)
     {
         var httpClient = new HttpClient();
@@ -123,6 +117,7 @@ public class ProductController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
     private static JsonSerializerOptions JsonOptions() => new JsonSerializerOptions
     {
         PropertyNameCaseInsensitive = true

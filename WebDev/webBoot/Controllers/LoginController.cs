@@ -50,15 +50,8 @@ public class LoginController : Controller
                 Username = model.Username,
                 Password = model.Password,
             };
-
-            var httpClient = new HttpClient();
-
-            var json = JsonSerializer.Serialize(userDto);
-            var httpContent = new StringContent(json,
-                Encoding.UTF8,
-                "application/json");
-
-            var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/User/Register", httpContent);
+         
+            var response = await new HttpClient().PostAsJsonAsync($"{_apiSettings.BaseUrl}/User/Register", userDto);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -83,14 +76,7 @@ public class LoginController : Controller
     [HttpPost]
     public async Task<IActionResult> Login(LoginModel model)
     {
-        var httpClient = new HttpClient();
-
-        var json = JsonSerializer.Serialize(model);
-        var httpContent = new StringContent(json,
-            Encoding.UTF8,
-            "application/json");
-
-        var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/User/GetUser", httpContent);
+        var response = await new HttpClient().PostAsJsonAsync($"{_apiSettings.BaseUrl}/User/GetUser", model);
 
         if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
         {
@@ -137,6 +123,7 @@ public class LoginController : Controller
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProperties);
 
     }
+
     public async Task<IActionResult> LogOut()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

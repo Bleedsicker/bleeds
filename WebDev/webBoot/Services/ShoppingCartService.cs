@@ -1,18 +1,6 @@
-﻿using WebDev.Models;
+﻿using WebDev.Interfaces;
+using WebDev.Models;
 namespace WebDev.Services;
-
-public interface IShoppingCartService
-{
-    Task AddToCart(long userId, long productId);
-
-    Task RemoveFromCart(long userId, long productId);
-
-    Task<ShoppingCartModel> GetCart(long userId);
-
-    Task ClearCart(long userId);
-
-    long GetUserId();
-}
 
 public class ShoppingCartService : IShoppingCartService
 {

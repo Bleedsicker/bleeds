@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using WebDev.Configuration;
-using WebDev.Services;
+using WebDev.Interfaces;
 
 namespace WebDev.Controllers
 {
@@ -36,6 +34,7 @@ namespace WebDev.Controllers
 
             return RedirectToAction("Index");
         }
+
         public async Task<IActionResult> ClearCart()
         {
             var userId = _shoppingCart.GetUserId();

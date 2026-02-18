@@ -1,6 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
-using System.Text;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using WebDev.Configuration;
 using WebDev.Dto;
@@ -16,20 +14,14 @@ public class CouponController : Controller
     }
     public async Task<IActionResult> Index()
     {
-        var httpClient = new HttpClient();
-        var response = await httpClient.GetAsync($"{_apiSettings.BaseUrl}/Coupon/GetCoupons");
+        var response = await new HttpClient().GetAsync($"{_apiSettings.BaseUrl}/Coupon/GetCoupons");
         if (!response.IsSuccessStatusCode)
         {
             return View(new List<CouponModel>());
         }
         var json = await response.Content.ReadAsStringAsync();
 
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-
-        var couponsDto = JsonSerializer.Deserialize<List<CouponDto>>(json, options) ?? new();
+        var couponsDto = JsonSerializer.Deserialize<List<CouponDto>>(json, JsonOptions()) ?? new();
         var result = couponsDto.Select(o => new CouponModel
         {
             CouponName = o.CouponName,
@@ -58,13 +50,7 @@ public class CouponController : Controller
             Id = model.Id
         };
 
-        var httpClient = new HttpClient();
-        var json = JsonSerializer.Serialize(couponDto);
-        var httpContent = new StringContent(json,
-                Encoding.UTF8,
-                "application/json");
-
-        var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/Coupon/AddCoupon", httpContent);
+        var response = await new HttpClient().PostAsJsonAsync($"{_apiSettings.BaseUrl}/Coupon/AddCoupon", couponDto);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -102,13 +88,7 @@ public class CouponController : Controller
             Id= model.Id
         };
 
-        var httpClient = new HttpClient();
-        var json = JsonSerializer.Serialize(couponDto);
-        var httpContent = new StringContent(json,
-                Encoding.UTF8,
-                "application/json");
-
-        var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/Coupon/AddCoupon", httpContent);
+        var response = await new HttpClient().PostAsJsonAsync($"{_apiSettings.BaseUrl}/Coupon/EditCoupon", couponDto);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -127,4 +107,8 @@ public class CouponController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+    private static JsonSerializerOptions JsonOptions() => new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
 }

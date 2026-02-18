@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using WebDev.Configuration;
 using WebDev.Dto;
-using WebDev.Services;
+using WebDev.Interfaces;
 
 namespace WebDev.Controllers
 {
@@ -21,8 +21,7 @@ namespace WebDev.Controllers
         {
             var userId = _shoppingCartService.GetUserId();
 
-            var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync($"{_apiSettings.BaseUrl}/Order/GetOrders?userId={userId}");
+            var response = await new HttpClient().GetAsync($"{_apiSettings.BaseUrl}/Order/GetOrders?userId={userId}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -36,8 +35,7 @@ namespace WebDev.Controllers
         }
         public async Task<IActionResult> Orders(long id)
         {
-            var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync($"{_apiSettings.BaseUrl}/Order/GetOrder?id={id}");
+            var response = await new HttpClient().GetAsync($"{_apiSettings.BaseUrl}/Order/GetOrder?id={id}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -67,8 +65,7 @@ namespace WebDev.Controllers
         {
             var userId = _shoppingCartService.GetUserId();
 
-            var httpClient = new HttpClient();
-            var response = await httpClient.PostAsync($"{_apiSettings.BaseUrl}/Order/PostOrder?userId={userId}",
+            var response = await new HttpClient().PostAsync($"{_apiSettings.BaseUrl}/Order/PostOrder?userId={userId}",
                 new StringContent("{}", Encoding.UTF8, "application/json"));
 
             if (!response.IsSuccessStatusCode)
