@@ -1,6 +1,8 @@
 using DataAccess.Repository;
 using Domain;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebDevAPI.Configuration;
 using WebDevAPI.Dto;
 
 namespace WebDevAPI.Controllers;
@@ -24,6 +26,8 @@ public class ProductController : ControllerBase
 
     [HttpGet]
     [Route("GetProduct/{productId}/{userId}")]
+    [Authorize(AuthenticationSchemes = ApiKeyAuthenticationSheme.SchemeName)]
+
     public IActionResult GetProduct(long productId, string userId)
     {
         var product = _productRepository.GetProduct(productId);
@@ -35,6 +39,8 @@ public class ProductController : ControllerBase
 
     [HttpPost]
     [Route("AddProduct")]
+    [Authorize(AuthenticationSchemes = ApiKeyAuthenticationSheme.SchemeName)]
+
     public IActionResult AddProduct([FromBody] ProductDto productDto)
     {
         var product = new Product

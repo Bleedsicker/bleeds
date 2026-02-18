@@ -1,6 +1,5 @@
 ﻿using DataAccess.Repository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Collections.Concurrent;
 using WebDevAPI.Dto;
 using WebDevAPI.Infrastructure;
@@ -11,7 +10,7 @@ namespace WebDevAPI.Controllers;
 [Route("[controller]")]
 public class ShoppingCartController : Controller
 {
-    private static ConcurrentDictionary<long, CartDto> _carts = CartStructure.Carts;
+    private ConcurrentDictionary<long, CartDto> _carts = CartStructure.Carts;
     private readonly IProductRepository _productRepository;
 
     public ShoppingCartController(IProductRepository productRepository)
