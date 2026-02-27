@@ -1,5 +1,4 @@
 using DataAccess;
-using DataAccess.Repository;
 using Microsoft.AspNetCore.Authentication;
 using System.Text.Json.Serialization;
 using WebDevAPI.Configuration;
@@ -19,6 +18,8 @@ builder.Services.AddDataAccessLayer(builder.Configuration);
 
 builder.Services.AddAuthentication(ApiKeyAuthenticationSheme.SchemeName)
     .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(ApiKeyAuthenticationSheme.SchemeName, null);
+
+var apiKey = builder.Configuration["ApiSettings:ApiKey"];
 
 var app = builder.Build();
 
