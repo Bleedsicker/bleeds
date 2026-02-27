@@ -9,43 +9,27 @@ namespace WebDev.Controllers
 {
     public class OrderController : Controller
     {
-        private readonly ApiSettings _apiSettings;
+        private readonly IApiService _apiService;
         private readonly IShoppingCartService _shoppingCartService;
 
-        public OrderController(ApiSettings apiSettings, IShoppingCartService shoppingCartService)
+        public OrderController(IApiService apiService, IShoppingCartService shoppingCartService)
         {
-            _apiSettings = apiSettings;
             _shoppingCartService = shoppingCartService;
+            _apiService = apiService;
         }
         public async Task<IActionResult> Index()
         {
             var userId = _shoppingCartService.GetUserId();
 
-            var response = await new HttpClient().GetAsync($"{_apiSettings.BaseUrl}/Order/GetOrders?userId={userId}");
+            var response = await _apiService.GetAsync<List<OrderDto>>($"Order/GetOrders?userId={userId}");
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return View(new List<OrderDto>());
-            }
-
-            var json = await response.Content.ReadAsStringAsync();
-            var orders = JsonSerializer.Deserialize<List<OrderDto>>(json, JsonOptions());
-
-            return View(orders ?? new List<OrderDto>());
+            return View(response ?? new List<OrderDto>());
         }
         public async Task<IActionResult> Orders(long id)
         {
-            var response = await new HttpClient().GetAsync($"{_apiSettings.BaseUrl}/Order/GetOrder?id={id}");
+            var response = await _apiService.GetAsync<OrderDto>($"Order/GetOrder?id={id}");
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return NotFound();
-            }
-
-            var json = await response.Content.ReadAsStringAsync();
-            var order = JsonSerializer.Deserialize<OrderDto>(json, JsonOptions());
-
-            return View(order);
+            return View(response);
         }
 
         [HttpGet]
@@ -64,23 +48,14 @@ namespace WebDev.Controllers
         public async Task<IActionResult> PostOrder()
         {
             var userId = _shoppingCartService.GetUserId();
-
-            var response = await new HttpClient().PostAsync($"{_apiSettings.BaseUrl}/Order/PostOrder?userId={userId}",
-                new StringContent("{}", Encoding.UTF8, "application/json"));
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return RedirectToAction("Index", "ShoppingCart");
-            }
+            
+            var response = _apiService.PostAsync($"Order/PostOrder?userId={userId}", userId);
 
             await _shoppingCartService.ClearCart(userId);
 
             return RedirectToAction("Index", "Order");
         }
 
-        private static JsonSerializerOptions JsonOptions() => new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
+        
     }
 }

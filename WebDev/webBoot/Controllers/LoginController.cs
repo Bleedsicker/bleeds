@@ -1,21 +1,22 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Text;
-using System.Text.Json;
 using WebDev.Configuration;
 using WebDev.Dto;
+using WebDev.Interfaces;
 using WebDev.Models;
 
 namespace WebDev.Controllers;
 
+[AllowAnonymous]
 public class LoginController : Controller
 {
-    private readonly ApiSettings _apiSettings;
-    public LoginController(ApiSettings apiSettings)
+    private readonly IApiService _apiService;
+    public LoginController(IApiService apiService)
     {
-        _apiSettings = apiSettings;
+        _apiService = apiService;
     }
 
     [HttpGet]
@@ -51,7 +52,7 @@ public class LoginController : Controller
                 Password = model.Password,
             };
          
-            var response = await new HttpClient().PostAsJsonAsync($"{_apiSettings.BaseUrl}/User/Register", userDto);
+            var response = await _apiService.PostAsync("User/Register", userDto);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -76,7 +77,7 @@ public class LoginController : Controller
     [HttpPost]
     public async Task<IActionResult> Login(LoginModel model)
     {
-        var response = await new HttpClient().PostAsJsonAsync($"{_apiSettings.BaseUrl}/User/GetUser", model);
+        var response = await _apiService.PostAsync("User/GetUser", model);
 
         if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
         {

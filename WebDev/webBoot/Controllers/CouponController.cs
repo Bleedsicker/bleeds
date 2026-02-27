@@ -2,27 +2,22 @@
 using System.Text.Json;
 using WebDev.Configuration;
 using WebDev.Dto;
+using WebDev.Interfaces;
 using WebDev.Models;
 
 namespace WebDev.Controllers;
 public class CouponController : Controller
 {
-    private readonly ApiSettings _apiSettings;
-    public CouponController(ApiSettings apiSettings)
+    private readonly IApiService _apiService;
+    public CouponController(IApiService apiService)
     {
-        _apiSettings = apiSettings;
+        _apiService = apiService;
     }
     public async Task<IActionResult> Index()
     {
-        var response = await new HttpClient().GetAsync($"{_apiSettings.BaseUrl}/Coupon/GetCoupons");
-        if (!response.IsSuccessStatusCode)
-        {
-            return View(new List<CouponModel>());
-        }
-        var json = await response.Content.ReadAsStringAsync();
+        var response = await _apiService.GetAsync<List<CouponDto>>("Coupons/GetCoupons");
 
-        var couponsDto = JsonSerializer.Deserialize<List<CouponDto>>(json, JsonOptions()) ?? new();
-        var result = couponsDto.Select(o => new CouponModel
+        var result = response.Select(o => new CouponModel
         {
             CouponName = o.CouponName,
             CouponId = o.CouponId,
@@ -50,7 +45,7 @@ public class CouponController : Controller
             Id = model.Id
         };
 
-        var response = await new HttpClient().PostAsJsonAsync($"{_apiSettings.BaseUrl}/Coupon/AddCoupon", couponDto);
+        var response = await _apiService.PostAsync("Coupon/AddCoupon", couponDto);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -88,7 +83,7 @@ public class CouponController : Controller
             Id= model.Id
         };
 
-        var response = await new HttpClient().PostAsJsonAsync($"{_apiSettings.BaseUrl}/Coupon/EditCoupon", couponDto);
+        var response = await _apiService.PostAsync("Coupon/EditCoupon", couponDto);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -102,13 +97,8 @@ public class CouponController : Controller
     }
     public async Task<IActionResult> DeleteCoupon(long id)
     {
-        var httpClient = new HttpClient();
-        await httpClient.DeleteAsync($"{_apiSettings.BaseUrl}/Coupon/DeleteCoupon/{id}");
+        await _apiService.DeleteAsync($"Coupon/DeleteCoupon/{id}");
 
         return RedirectToAction(nameof(Index));
     }
-    private static JsonSerializerOptions JsonOptions() => new JsonSerializerOptions
-    {
-        PropertyNameCaseInsensitive = true
-    };
 }

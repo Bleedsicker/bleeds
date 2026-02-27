@@ -1,8 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using WebDev.Configuration;
 using WebDev.Dto;
 using WebDev.Interfaces;
 using WebDev.Models;
@@ -12,11 +8,9 @@ namespace WebDev.Controllers;
 
 public class ProductController : Controller
 {
-    private readonly ApiSettings _apiSettings;
     private readonly IApiService _apiService;
-    public ProductController(ApiSettings apiSettings, IApiService apiService)
+    public ProductController(IApiService apiService)
     {
-        _apiSettings = apiSettings;
         _apiService = apiService;
     }
 
@@ -91,15 +85,16 @@ public class ProductController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var response = await new HttpClient().GetAsync($"{_apiSettings.BaseUrl}/Product/GetProducts");
-        if (!response.IsSuccessStatusCode)
-        {
-            return View(new List<ProductModel>());
-        }
-        var json = await response.Content.ReadAsStringAsync();
+        var response = await _apiService.GetAsync<List<ProductDto>>("Product/GetProducts");
+        //var response = await new HttpClient().GetAsync($"{_apiSettings.BaseUrl}/Product/GetProducts");
+        //if (!response.IsSuccessStatusCode)
+        //{
+        //    return View(new List<ProductModel>());
+        //}
+        //var json = await response.Content.ReadAsStringAsync();
 
-        var productsDto = JsonSerializer.Deserialize<List<ProductDto>>(json, JsonOptions());
-        var result = productsDto.Select(o => new ProductModel
+        //var productsDto = JsonSerializer.Deserialize<List<ProductDto>>(response, JsonOptions());
+        var result = response.Select(o => new ProductModel
         {
             ProductId = o.Id,
             Price = o.Price,
@@ -112,14 +107,7 @@ public class ProductController : Controller
 
     public async Task<IActionResult> DeleteProduct(long id)
     {
-        var httpClient = new HttpClient();
-        await httpClient.DeleteAsync($"{_apiSettings.BaseUrl}/Product/DeleteProduct/{id}");
-
+        await _apiService.DeleteAsync($"Product/DeleteProduct/{id}");
         return RedirectToAction(nameof(Index));
     }
-
-    private static JsonSerializerOptions JsonOptions() => new JsonSerializerOptions
-    {
-        PropertyNameCaseInsensitive = true
-    };
 }

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using WebDev.Authorization;
 using WebDev.Configuration;
 using WebDev.Interfaces;
@@ -6,7 +8,14 @@ using WebDev.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+    .RequireAuthenticatedUser()
+    .Build();
+    
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
 
 var apiSettings = new ApiSettings();
 builder.Configuration.GetSection("WebDevApi").Bind(apiSettings);
@@ -70,9 +79,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
