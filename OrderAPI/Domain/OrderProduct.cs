@@ -1,0 +1,14 @@
+﻿namespace Domain;
+
+public class OrderProduct
+{
+    public decimal UnitPrice { get; set; }
+
+    public long ProductId { get; set; }
+
+    public long OrderId { get; set; }
+
+    public long Quantity { get; set; }
+
+    public Order Order { get; set; }
+}
