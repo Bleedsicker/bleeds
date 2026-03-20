@@ -8,11 +8,18 @@ namespace WebDev.Services;
 
 public class ApiService : IApiService
 {
-    private readonly HttpClient _httpClient;
+    private HttpClient _httpClient;
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    public ApiService(HttpClient httpClient, ApiSettings apiSettings)
+    public ApiService(HttpClient httpClient, IHttpClientFactory httpClientFactory)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
+        _httpClient = _httpClientFactory.CreateClient("WebDevAPI");
+    }
+
+    public void UseApi(string clientName)
+    {
+        _httpClient = _httpClientFactory.CreateClient(clientName);
     }
 
     public async Task<HttpResponseMessage> PostAsync<T>(string url, T dto)

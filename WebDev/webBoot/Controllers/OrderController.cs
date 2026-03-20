@@ -21,12 +21,16 @@ namespace WebDev.Controllers
         {
             var userId = _shoppingCartService.GetUserId();
 
+            _apiService.UseApi("OrderAPI");
+
             var response = await _apiService.GetAsync<List<OrderDto>>($"Order/GetOrders?userId={userId}");
 
             return View(response ?? new List<OrderDto>());
         }
         public async Task<IActionResult> Orders(long id)
         {
+            _apiService.UseApi("OrderAPI");
+
             var response = await _apiService.GetAsync<OrderDto>($"Order/GetOrder?id={id}");
 
             return View(response);
@@ -48,7 +52,9 @@ namespace WebDev.Controllers
         public async Task<IActionResult> PostOrder()
         {
             var userId = _shoppingCartService.GetUserId();
-            
+
+            _apiService.UseApi("OrderAPI");
+
             var response = _apiService.PostAsync($"Order/PostOrder?userId={userId}", userId);
 
             await _shoppingCartService.ClearCart(userId);

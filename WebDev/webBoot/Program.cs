@@ -57,9 +57,16 @@ builder.Services.AddMvc(options =>
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddHttpClient<IApiService, ApiService>(client =>
+builder.Services.AddHttpClient<IApiService, ApiService>("WebDevAPI", client =>
 {
     client.BaseAddress = new Uri(apiSettings.BaseUrl);
+
+    client.DefaultRequestHeaders.Add("WebDev-api-key", apiSettings.ApiKey);
+});
+
+builder.Services.AddHttpClient<IApiService, ApiService>("OrderAPI", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7248/");
 
     client.DefaultRequestHeaders.Add("WebDev-api-key", apiSettings.ApiKey);
 });
