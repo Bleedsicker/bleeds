@@ -10,5 +10,4 @@ public class Product
 
     public long Id { get; set; }  
 
-    public ICollection<OrderProduct> OrderProducts { get; set; }
 }

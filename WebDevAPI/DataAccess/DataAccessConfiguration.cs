@@ -21,8 +21,6 @@ public static class DataAccessConfiguration
 
         services.AddScoped<ICouponRepository, CouponRepository>();
 
-        services.AddScoped<IOrderRepository, OrderRepository>();
-
         return services;
     }
 }
